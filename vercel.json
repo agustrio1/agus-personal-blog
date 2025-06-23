@@ -1,0 +1,16 @@
+{
+    "build": {
+      "env": {
+        "PRISMA_GENERATE": "true"
+      }
+    },
+    "routes": [
+      {
+        "src": "/api/(.*)",
+        "headers": {
+          "x-prisma-generate": "true"
+        }
+      }
+    ]
+  }
+  

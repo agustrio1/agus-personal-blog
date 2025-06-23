@@ -1,0 +1,86 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+   url       = env("DATABASE_URL")
+   directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id        String   @id @default(ulid())
+  name      String
+  email     String   @unique
+  password  String
+  posts     Post[]
+  projects  Project[]
+  createdAt DateTime @default(now())
+  loginAttempts            Int       @default(0)
+  lastLoginAttempt         DateTime?
+  verificationCode         String?
+  verificationCodeExpires  DateTime?
+  isVerified               Boolean   @default(false)
+}
+
+model Category {
+  id        String   @id @default(ulid())
+  name      String   @unique
+  slug      String   @unique
+  posts     Post[]
+  projects  Project[]
+  createdAt DateTime @default(now())
+}
+
+model Post {
+  id          String     @id @default(ulid())
+  title       String
+  slug        String     @unique
+  content     String
+  published   Boolean    @default(false)
+  author      User?      @relation(fields: [authorId], references: [id])
+  authorId    String?
+  category    Category?  @relation(fields: [categoryId], references: [id])
+  categoryId  String?
+  images      PostImage[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model PostImage {
+  id        String   @id @default(ulid())
+  url       String
+  alt       String?
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    String
+  createdAt DateTime @default(now())
+
+  @@unique([postId, url])
+}
+
+model Project {
+  id          String     @id @default(ulid())
+  title       String
+  slug        String     @unique
+  description String
+  imageUrl    String?
+  link        String?
+  author      User?      @relation(fields: [authorId], references: [id])
+  authorId    String?
+  category    Category?  @relation(fields: [categoryId], references: [id])
+  categoryId  String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model SiteSetting {
+  id              Int     @id @default(1)
+  blogName        String?
+  blogDescription String?
+}
