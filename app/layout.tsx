@@ -38,8 +38,8 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="canonical" href="https://example.com/projects" />
-        <link rel="canonical" href="https://example.com/projects/[slug]" />
+        <link rel="canonical" href="https://agus-personal-blog.vercel.app/projects" />
+        <link rel="canonical" href="https://agus-personal-blog.vercel.app/[slug]" />
       </head>
       <body className={inter.className}>
         <Providers blogName={settings.blogName || "Personal Blog"}>
