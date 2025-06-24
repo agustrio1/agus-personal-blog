@@ -71,8 +71,23 @@ export async function PUT(
       )
     }
 
-    const body = await request.json()
-    const { title, content, categoryId, published } = body
+    let title: string | undefined, content: string | undefined, categoryId: string | undefined, published: boolean | undefined;
+
+    const contentType = request.headers.get("content-type") || "";
+    if (contentType.includes("multipart/form-data")) {
+      const formData = await request.formData();
+      title = formData.get("title") as string;
+      content = formData.get("content") as string;
+      categoryId = formData.get("categoryId") as string | undefined;
+      const publishedRaw = formData.get("published");
+      published = publishedRaw === "true";
+    } else {
+      const body = await request.json();
+      title = body.title;
+      content = body.content;
+      categoryId = body.categoryId;
+      published = body.published;
+    }
 
     // Check if post exists and user owns it
     const existingPost = await prisma.post.findUnique({
@@ -119,7 +134,7 @@ export async function PUT(
     }
 
     // Extract new image URLs from content
-    const $ = cheerio.load(content)
+    const $ = cheerio.load(content || "")
     const newImageUrls = $('img').map((i, el) => $(el).attr('src')).get()
 
     // Update post and handle images

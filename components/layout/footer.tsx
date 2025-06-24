@@ -17,7 +17,7 @@ export function Footer() {
               href="/"
               className="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors duration-200"
             >
-              Personal Blog
+             Agus Dev
             </Link>
           </div>
 
@@ -33,7 +33,7 @@ export function Footer() {
               Kontak
             </Link>
             <a
-              href="https://wa.me/6281234567890"
+              href="https://wa.me/6281262465409"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-gray-900 dark:hover:text-gray-200 transition-colors duration-200"

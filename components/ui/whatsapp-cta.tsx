@@ -34,7 +34,7 @@ export function WhatsAppCTA() {
 
   return (
     <a
-      href="https://wa.me/6281234567890"
+      href="https://wa.me/+6281262465409"
       target="_blank"
       rel="noopener"
       className={`fixed z-50 bottom-6 right-4 sm:right-8 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-lg flex items-center px-4 py-2 gap-2 font-semibold text-sm transition-all duration-300 ease-out

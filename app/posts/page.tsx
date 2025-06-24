@@ -1,23 +1,24 @@
-import Link from "next/link"
-import { prisma } from "@/lib/db"
-import type { Metadata } from "next"
-import { Calendar, User, Hash, Search } from "lucide-react"
+export const revalidate = 60
+export const dynamic = "force-static"
 
-export const metadata: Metadata = {
+export const metadata = {
   title: "Semua Postingan | Blog",
   description: "Jelajahi semua artikel dan kategori di blog ini.",
 }
 
-export default async function PostsPage({ searchParams }: { searchParams: Promise<{ category?: string }> }) {
-  const params = await searchParams
+import Link from "next/link"
+import { prisma } from "@/lib/db"
+import { Calendar, User, Hash, Search } from "lucide-react"
 
+export default async function PostsPage({ searchParams }: { searchParams: Promise<{ category?: string }> }) {
+  const params = await searchParams || {}
   const categories = await prisma.category.findMany({
     orderBy: { name: "asc" },
     select: { id: true, name: true, slug: true },
   })
 
   const where: Record<string, unknown> = { published: true }
-  if (params?.category) {
+  if (params.category) {
     where.category = { slug: params.category }
   }
 
@@ -50,7 +51,7 @@ export default async function PostsPage({ searchParams }: { searchParams: Promis
             <Link
               href="/posts"
               className={`px-4 py-2.5 rounded-2xl font-medium transition-all duration-300 backdrop-blur-sm border ${
-                !params?.category
+                !params.category
                   ? "bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-600/25"
                   : "bg-white/60 dark:bg-black/20 text-gray-700 dark:text-gray-300 border-white/20 dark:border-white/10 hover:bg-white/80 dark:hover:bg-black/30"
               }`}
@@ -62,7 +63,7 @@ export default async function PostsPage({ searchParams }: { searchParams: Promis
                 key={cat.id}
                 href={`/posts?category=${cat.slug}`}
                 className={`px-4 py-2.5 rounded-2xl font-medium transition-all duration-300 backdrop-blur-sm border ${
-                  params?.category === cat.slug
+                  params.category === cat.slug
                     ? "bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-600/25"
                     : "bg-white/60 dark:bg-black/20 text-gray-700 dark:text-gray-300 border-white/20 dark:border-white/10 hover:bg-white/80 dark:hover:bg-black/30"
                 }`}
