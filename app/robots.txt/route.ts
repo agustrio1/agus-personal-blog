@@ -9,9 +9,6 @@ Allow: /
 
 Sitemap: ${siteUrl}/sitemap.xml
 Sitemap: ${siteUrl}/sitemap
-
-# RSS Feed
-Feed: ${siteUrl}/rss.xml
   `.trim()
 
   return new NextResponse(content, {
