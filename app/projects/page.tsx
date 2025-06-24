@@ -7,6 +7,9 @@ import Image from "next/image"
 export const metadata: Metadata = {
   title: "Semua Project | Blog",
   description: "Jelajahi semua project portfolio di blog ini.",
+  alternates: {
+    canonical: `https://agusdev.my.id/projects/`
+  }
 }
 
 export default async function ProjectsPage() {

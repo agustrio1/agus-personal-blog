@@ -1,9 +1,22 @@
 import { NextResponse } from "next/server"
 
 export async function GET() {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL!
-  const robots = `User-agent: *\nAllow: /\nSitemap: ${baseUrl}/sitemap.xml\n`
-  return new NextResponse(robots, {
-    headers: { "Content-Type": "text/plain" }
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://agusdev.my.id"
+
+  const content = `
+User-agent: *
+Allow: /
+
+Sitemap: ${siteUrl}/sitemap.xml
+Sitemap: ${siteUrl}/sitemap
+
+# RSS Feed
+Feed: ${siteUrl}/rss.xml
+  `.trim()
+
+  return new NextResponse(content, {
+    headers: {
+      "Content-Type": "text/plain"
+    }
   })
-} 
+}

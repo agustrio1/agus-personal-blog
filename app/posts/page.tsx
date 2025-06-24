@@ -4,11 +4,15 @@ export const dynamic = "force-static"
 export const metadata = {
   title: "Semua Postingan | Blog",
   description: "Jelajahi semua artikel dan kategori di blog ini.",
+  alternates: {
+    canonical: `https://agusdev.my.id/posts`
+  }
 }
 
 import Link from "next/link"
 import { prisma } from "@/lib/db"
 import { Calendar, User, Hash, Search } from "lucide-react"
+import { CategoryFilter } from "@/components/posts/category-filter"
 
 export default async function PostsPage({ searchParams }: { searchParams: Promise<{ category?: string }> }) {
   const params = await searchParams || {}
@@ -47,31 +51,7 @@ export default async function PostsPage({ searchParams }: { searchParams: Promis
 
         {/* Category Filter */}
         <div className="mb-12">
-          <div className="flex flex-wrap gap-3 justify-center">
-            <Link
-              href="/posts"
-              className={`px-4 py-2.5 rounded-2xl font-medium transition-all duration-300 backdrop-blur-sm border ${
-                !params.category
-                  ? "bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-600/25"
-                  : "bg-white/60 dark:bg-black/20 text-gray-700 dark:text-gray-300 border-white/20 dark:border-white/10 hover:bg-white/80 dark:hover:bg-black/30"
-              }`}
-            >
-              Semua
-            </Link>
-            {categories.map((cat) => (
-              <Link
-                key={cat.id}
-                href={`/posts?category=${cat.slug}`}
-                className={`px-4 py-2.5 rounded-2xl font-medium transition-all duration-300 backdrop-blur-sm border ${
-                  params.category === cat.slug
-                    ? "bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-600/25"
-                    : "bg-white/60 dark:bg-black/20 text-gray-700 dark:text-gray-300 border-white/20 dark:border-white/10 hover:bg-white/80 dark:hover:bg-black/30"
-                }`}
-              >
-                {cat.name}
-              </Link>
-            ))}
-          </div>
+          <CategoryFilter categories={categories} />
         </div>
 
         {/* Posts Grid */}

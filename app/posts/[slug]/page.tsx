@@ -15,6 +15,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title: post.title,
     description: post.content.replace(/<[^>]+>/g, "").slice(0, 160),
+    alternates: {
+      canonical: `https://agusdev.my.id/posts/${(await params).slug}`
+    }
   }
 }
 

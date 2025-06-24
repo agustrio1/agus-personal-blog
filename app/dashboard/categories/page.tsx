@@ -41,10 +41,10 @@ function CategoriesContent() {
       const response = await fetch(`/api/categories?page=${page}&limit=10`)
       if (!response.ok) throw new Error("Gagal mengambil data")
       const data = await response.json()
-      setCategories(data.data)
-      setCurrentPage(data.page)
-      setTotalPages(data.totalPages)
-      setTotalItems(data.total)
+      setCategories(Array.isArray(data.categories) ? data.categories : [])
+      setCurrentPage(data.pagination?.page || 1)
+      setTotalPages(data.pagination?.totalPages || 1)
+      setTotalItems(data.pagination?.total || 0)
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message)
