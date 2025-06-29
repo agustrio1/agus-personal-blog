@@ -1,0 +1,17 @@
+#nprogress {
+    pointer-events: none;
+  }
+  
+  #nprogress .bar {
+    background: #6366f1; /* Indigo, sesuaikan dengan tema Anda */
+    position: fixed;
+    z-index: 1031;
+    top: 0; /* Atur ke bawah navbar jika navbar fixed, misal top: 64px; */
+    left: 0;
+    width: 100%;
+    height: 3px; /* Tipis */
+  }
+  
+  #nprogress .peg {
+    display: none;
+  }

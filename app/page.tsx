@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { getSiteSettings } from "@/lib/get-settings"
 import { prisma } from "@/lib/db"
 import Link from "next/link"
@@ -58,6 +60,16 @@ export default async function Home() {
               priority
             />
           </div>
+        </section>
+
+        {/* Section SEO Jasa Web */}
+        <section className="max-w-4xl mx-auto px-4 mb-8">
+          <h2 className="text-2xl font-bold mb-2 text-center">
+            Jasa Pembuatan Website Kediri, Surabaya, Jakarta, Bandung
+          </h2>
+          <p className="text-center text-gray-700 dark:text-gray-200">
+            Kami melayani jasa pembuatan website profesional untuk bisnis dan personal di Kediri, Surabaya, Jakarta, dan Bandung. Konsultasi gratis, pengerjaan cepat, dan support penuh untuk kebutuhan digital Anda!
+          </p>
         </section>
 
         {/* Value Proposition Section */}
