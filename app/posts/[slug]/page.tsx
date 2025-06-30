@@ -1,113 +1,189 @@
-import { prisma } from "@/lib/db"
-import Link from "next/link"
+import { Suspense } from "react"
 import { notFound } from "next/navigation"
 import type { Metadata } from "next"
-import { Calendar, User, Hash, ArrowLeft } from "lucide-react"
-import { ShareButton } from "@/components/share-button"
+import { getPostBySlug, getRelatedPosts } from "@/lib/get-posts"
+import { PostContent } from "@/components/posts/post-content"
+import { PostHeader } from "@/components/posts/post-header"
+import { RelatedPosts } from "@/components/posts/related-posts"
+import { PostLoading } from "@/components/posts/post-loading"
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
-  const { slug } = await params
-  const post = await prisma.post.findUnique({
-    where: { slug },
-    select: { title: true, content: true },
-  })
-  if (!post) return {}
-  return {
-    title: post.title,
-    description: post.content.replace(/<[^>]+>/g, "").slice(0, 160),
-    alternates: {
-      canonical: `https://agusdev.my.id/posts/${(await params).slug}`
-    }
+// Static params generation untuk ISR
+export async function generateStaticParams() {
+  const { prisma } = await import("@/lib/db")
+
+  try {
+    const posts = await prisma.post.findMany({
+      where: { published: true },
+      select: { slug: true },
+      take: 100, // Generate top 100 posts statically
+      orderBy: { createdAt: "desc" },
+    })
+
+    return posts.map((post) => ({
+      slug: post.slug,
+    }))
+  } catch (error) {
+    console.error("Error generating static params:", error)
+    return []
   }
 }
 
-export default async function PostDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+// Optimized metadata generation
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
-  const post = await prisma.post.findUnique({
-    where: { slug },
-    include: {
-      author: { select: { name: true } },
-      category: { select: { name: true, slug: true } },
-      images: { select: { url: true, alt: true, id: true } },
-    },
-  })
+  const post = await getPostBySlug(slug)
 
-  if (!post || !post.published) return notFound()
+  if (!post) {
+    return {
+      title: "Post Tidak Ditemukan",
+      description: "Post yang Anda cari tidak ditemukan.",
+    }
+  }
+
+  const baseUrl = "https://agusdev.my.id"
+  const postUrl = `${baseUrl}/posts/${slug}`
+  const description =  post.content.replace(/<[^>]+>/g, "").slice(0, 160)
+  const imageUrl = post.images?.[0]?.url || `${baseUrl}/og-post-default.png`
+
+  return {
+    title: `${post.title} | Blog Agus Dev`,
+    description,
+    keywords: [post.category?.name || "", "web development", "tutorial", "programming", "digital marketing"].filter(
+      Boolean,
+    ),
+    authors: [{ name: post.author?.name || "Agus Dev" }],
+    alternates: {
+      canonical: postUrl,
+    },
+    openGraph: {
+      title: post.title,
+      description,
+      url: postUrl,
+      siteName: "Blog Agus Dev",
+      type: "article",
+      publishedTime: new Date(post.createdAt).toISOString(),
+      modifiedTime: new Date(post.updatedAt).toISOString(),
+      authors: [post.author?.name || "Agus Dev"],
+      section: post.category?.name,
+      tags: post.category?.name ? [post.category.name] : [],
+      images: [
+        {
+          url: imageUrl,
+          width: 1200,
+          height: 630,
+          alt: post.title,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description,
+      images: [imageUrl],
+      creator: "@agusdev",
+    },
+    robots: {
+      index: true,
+      follow: true,
+      nocache: false,
+      googleBot: {
+        index: true,
+        follow: true,
+        noimageindex: false,
+        "max-video-preview": -1,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+      },
+    },
+  }
+}
+
+interface PostDetailPageProps {
+  params: Promise<{ slug: string }>
+}
+
+export default async function PostDetailPage({ params }: PostDetailPageProps) {
+  const { slug } = await params
+  const post = await getPostBySlug(slug)
+
+  if (!post) {
+    notFound()
+  }
+
+  // Structured data object dengan proper typing
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: post.title,
+    description:  post.content.replace(/<[^>]+>/g, "").slice(0, 160),
+    image: post.images?.[0]?.url || "https://agusdev.my.id/og-post-default.png",
+    author: {
+      "@type": "Person",
+      name: post.author?.name || "Agus Dev",
+      url: "https://agusdev.my.id/about",
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "Agus Dev Blog",
+      logo: {
+        "@type": "ImageObject",
+        url: "https://agusdev.my.id/logo.png",
+      },
+    },
+    datePublished: new Date(post.createdAt).toISOString(),
+    dateModified: new Date(post.updatedAt).toISOString(),
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `https://agusdev.my.id/posts/${slug}`,
+    },
+    articleSection: post.category?.name,
+    keywords: post.category?.name,
+    wordCount: post.content.replace(/<[^>]+>/g, "").split(/\s+/).length,
+    timeRequired: `PT${Math.ceil(post.content.replace(/<[^>]+>/g, "").split(/\s+/).length / 200)}M`,
+  }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-blue-50/50 via-white to-purple-50/50 dark:from-gray-900 dark:via-gray-800 dark:to-purple-900/20">
-      <div className="max-w-4xl mx-auto pt-28 pb-16 px-4">
-        {/* Back Button */}
-        <Link
-          href="/posts"
-          className="inline-flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-300 mb-8 group"
-        >
-          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform duration-300" />
-          Kembali ke daftar post
-        </Link>
+    <>
+      {/* Structured Data untuk SEO */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(structuredData),
+        }}
+      />
 
-        <article className="bg-white/60 dark:bg-black/20 backdrop-blur-sm border border-white/20 dark:border-white/10 rounded-3xl overflow-hidden shadow-2xl shadow-black/5 dark:shadow-white/5">
-          {/* Featured Image */}
-          {/* {post.images?.[0] && (
-            <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 overflow-hidden">
-              <img
-                src={post.images[0].url || "/placeholder.svg"}
-                alt={post.images[0].alt || post.title}
-                className="w-full h-full object-cover"
-              />
-            </div>
-          )} */}
+      <main className="min-h-screen bg-gradient-to-br from-blue-50/50 via-white to-purple-50/50 dark:from-gray-900 dark:via-gray-800 dark:to-purple-900/20">
+        <div className="max-w-4xl mx-auto pt-28 pb-16 px-4">
+          {/* Post Header */}
+          <PostHeader post={post} />
 
-          <div className="p-8 md:p-12">
-            {/* Title */}
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
-              {post.title}
-            </h1>
+          {/* Post Content */}
+          <Suspense fallback={<PostLoading />}>
+            <PostContent post={post} />
+          </Suspense>
 
-            {/* Meta Info */}
-            <div className="flex flex-wrap items-center gap-6 text-gray-500 dark:text-gray-400 mb-8 pb-8 border-b border-gray-200/50 dark:border-gray-700/50">
-              <div className="flex items-center gap-2">
-                <Calendar className="w-5 h-5" />
-                <span className="font-medium">
-                  {new Date(post.createdAt).toLocaleDateString("id-ID", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
-                </span>
-              </div>
-
-              {post.category && (
-                <Link
-                  href={`/posts?category=${post.category.slug}`}
-                  className="flex items-center gap-2 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-300"
-                >
-                  <Hash className="w-5 h-5" />
-                  <span className="font-medium">{post.category.name}</span>
-                </Link>
-              )}
-
-              <div className="flex items-center gap-2">
-                <User className="w-5 h-5" />
-                <span className="font-medium">{post.author?.name}</span>
-              </div>
-
-              <div className="ml-auto">
-                <ShareButton
-                  title={post.title}
-                  url={`/posts/${post.slug}`}
-                />
-              </div>
-            </div>
-
-            {/* Content */}
-            <div
-              className="prose prose-lg max-w-none prose-headings:text-gray-900 dark:prose-headings:text-white prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-strong:text-gray-900 dark:prose-strong:text-white prose-code:text-blue-600 dark:prose-code:text-blue-400 prose-pre:bg-gray-100 dark:prose-pre:bg-gray-800 prose-blockquote:border-blue-500 prose-blockquote:text-gray-700 dark:prose-blockquote:text-gray-300"
-              dangerouslySetInnerHTML={{ __html: post.content }}
-            />
-          </div>
-        </article>
-      </div>
-    </main>
+          {/* Related Posts */}
+          <Suspense fallback={<div className="mt-16 animate-pulse h-64 bg-gray-200 dark:bg-gray-700 rounded-3xl" />}>
+            <RelatedPostsWrapper categorySlug={post.category?.slug} currentPostId={post.id} />
+          </Suspense>
+        </div>
+      </main>
+    </>
   )
 }
+
+// Wrapper untuk Related Posts
+async function RelatedPostsWrapper({ categorySlug, currentPostId }: { categorySlug?: string; currentPostId: string }) {
+  if (!categorySlug) return null
+
+  const relatedPosts = await getRelatedPosts(categorySlug, currentPostId)
+
+  if (relatedPosts.length === 0) return null
+
+  return <RelatedPosts posts={relatedPosts} />
+}
+
+// Enable ISR
+export const revalidate = 3600 // 1 hour
+export const dynamic = "force-static"
+export const dynamicParams = true

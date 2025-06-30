@@ -3,8 +3,10 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
 import { Providers } from "./providers"
+import { AnalyticsProvider } from "@/components/analytics/analytics-provider"
 import { getSiteSettings } from "@/lib/get-settings"
-import TopProgressBar from "@/components/ui/top-progress-bar";
+import TopProgressBar from "@/components/ui/top-progress-bar"
+import { Suspense } from "react"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -12,11 +14,10 @@ const inter = Inter({ subsets: ["latin"] })
 export async function generateMetadata(): Promise<Metadata> {
   try {
     const settings = await getSiteSettings()
-
     const title = settings?.blogName || "Personal Blog"
     const description = settings?.blogDescription || "A modern personal blog with authentication"
-    const url = "https://agusdev.my.id"; // Ganti dengan domain Anda
-    const image = "https://agusdev.my.id/og-image.png"; // Ganti dengan OG image Anda
+    const url = "https://agusdev.my.id"
+    const image = "https://agusdev.my.id/og-image.png"
 
     return {
       title,
@@ -28,7 +29,7 @@ export async function generateMetadata(): Promise<Metadata> {
         "jasa web bandung",
         "jasa pembuatan website profesional",
         "konsultasi website gratis",
-        "web developer indonesia"
+        "web developer indonesia",
       ],
       metadataBase: new URL(url),
       openGraph: {
@@ -64,7 +65,6 @@ export async function generateMetadata(): Promise<Metadata> {
     }
   } catch (error) {
     console.error("Failed to generate metadata:", error)
-    // Fallback metadata jika terjadi error
     return {
       title: "Personal Blog",
       description: "A modern personal blog with authentication",
@@ -78,6 +78,7 @@ export default async function RootLayout({
   children: React.ReactNode
 }) {
   const settings = await getSiteSettings()
+
   return (
     <html lang="en">
       <head>
@@ -87,18 +88,22 @@ export default async function RootLayout({
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "Organization",
-              "name": "Personal Blog",
-              "url": "https://agusdev.my.id",
-              "logo": "https://agusdev.my.id/og-image.png"
-            })
+              name: "Personal Blog",
+              url: "https://agusdev.my.id",
+              logo: "https://agusdev.my.id/og-image.png",
+            }),
           }}
         />
       </head>
       <body className={inter.className}>
-        <Providers blogName={settings.blogName || "Personal Blog"}>
-        <TopProgressBar />
-          {children}
-        </Providers>
+        <Suspense fallback={<div>Loading...</div>}>
+          <Providers blogName={settings.blogName || "Personal Blog"}>
+            <AnalyticsProvider gaId={process.env.NEXT_PUBLIC_GA_ID!}>
+              <TopProgressBar />
+              {children}
+            </AnalyticsProvider>
+          </Providers>
+        </Suspense>
       </body>
     </html>
   )
