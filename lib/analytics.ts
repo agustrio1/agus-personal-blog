@@ -12,6 +12,11 @@ export const trackEvent = (action: string, category: string, label?: string, val
   }
 }
 
+// Track WhatsApp specific events
+export const trackWhatsAppEvent = (action: "click" | "open" | "message_send", source: string) => {
+  trackEvent(`whatsapp_${action}`, "whatsapp_engagement", source, 1)
+}
+
 // Track custom events dengan throttling dan null checks
 let eventQueue: Array<() => void> = []
 let isProcessing = false

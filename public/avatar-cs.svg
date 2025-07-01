@@ -1,0 +1,18 @@
+<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="60" cy="60" r="58" fill="#E0F2FE" stroke="#38BDF8" stroke-width="4"/>
+  <ellipse cx="60" cy="70" rx="32" ry="36" fill="#F1F5F9"/>
+  <ellipse cx="60" cy="56" rx="24" ry="24" fill="#FBBF24"/>
+  <ellipse cx="60" cy="60" rx="16" ry="18" fill="#FDE68A"/>
+  <ellipse cx="60" cy="70" rx="18" ry="10" fill="#F1F5F9"/>
+  <!-- Headphones -->
+  <path d="M28 70a32 32 0 0 1 64 0" stroke="#38BDF8" stroke-width="6" fill="none"/>
+  <rect x="18" y="68" width="12" height="20" rx="6" fill="#38BDF8"/>
+  <rect x="90" y="68" width="12" height="20" rx="6" fill="#38BDF8"/>
+  <!-- Face -->
+  <ellipse cx="60" cy="62" rx="8" ry="7" fill="#FDE68A"/>
+  <!-- Eyes -->
+  <ellipse cx="56" cy="60" rx="1.5" ry="2" fill="#444"/>
+  <ellipse cx="64" cy="60" rx="1.5" ry="2" fill="#444"/>
+  <!-- Smile -->
+  <path d="M56 66 Q60 70 64 66" stroke="#F59E42" stroke-width="2" fill="none"/>
+</svg> 
