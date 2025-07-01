@@ -43,7 +43,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const baseUrl = "https://agusdev.my.id"
   const postUrl = `${baseUrl}/posts/${slug}`
   const description =  post.content.replace(/<[^>]+>/g, "").slice(0, 160)
-  const imageUrl = post.images?.[0]?.url || `${baseUrl}/og-post-default.png`
+  const imageUrl = post.images?.[0]?.url || `${baseUrl}/og-image.png`
 
   return {
     title: `${post.title} | Blog Agus Dev`,

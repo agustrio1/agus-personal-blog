@@ -1,12 +1,15 @@
 import { prisma } from "@/lib/db"
+import { unstable_cache } from "next/cache"
 
-export async function getSiteSettings() {
-  try {
+// Optimasi: Cache settings dengan waktu yang lebih lama
+export const getSiteSettings = unstable_cache(
+  async () => {
+    try {
     if (!prisma) {
       // Prisma tidak terinisialisasi
       return {
-        blogName: "Personal Blog",
-        blogDescription: "A modern personal blog with authentication",
+        blogName: "Agus Dev",
+        blogDescription: "Solusi website modern, dan tips teknologi praktis untuk bisnis Anda.",
       }
     }
     const settings = await prisma.siteSetting.findUnique({
@@ -14,16 +17,21 @@ export async function getSiteSettings() {
     })
     if (!settings) {
       return {
-        blogName: "Personal Blog",
-        blogDescription: "A modern personal blog with authentication",
+        blogName: "Agus Dev",
+        blogDescription: "Solusi website modern, dan tips teknologi praktis untuk bisnis Anda.",
       }
     }
     return settings
   } catch {
     // Fallback jika koneksi DB gagal atau tabel tidak ada
     return {
-      blogName: "Personal Blog",
-      blogDescription: "A modern personal blog with authentication",
+      blogName: "Agus Dev",
+      blogDescription: "Solusi website modern, dan tips teknologi praktis untuk bisnis Anda.",
     }
   }
 } 
+, ["site-settings"], {
+    revalidate: 7200, // Cache selama 2 jam
+    tags: ["site-settings"],
+  }
+)

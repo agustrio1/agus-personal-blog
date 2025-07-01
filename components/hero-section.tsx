@@ -51,6 +51,8 @@ export function HeroSection({ settings }: HeroSectionProps) {
           height={400}
           className="w-80 h-80 md:w-96 md:h-96 object-contain drop-shadow-xl"
           priority
+          placeholder="blur"
+          blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjY2NjIi8+PC9zdmc+"
         />
       </div>
     </section>

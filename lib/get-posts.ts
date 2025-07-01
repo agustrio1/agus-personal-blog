@@ -65,7 +65,7 @@ export const getLatestPosts = unstable_cache(
     return await prisma.post.findMany({
       where: { published: true },
       orderBy: { createdAt: "desc" },
-      take: 6,
+      take: 4,
       select: {
         id: true,
         title: true,
@@ -74,7 +74,7 @@ export const getLatestPosts = unstable_cache(
         content: true,
         images: {
           select: { url: true },
-          take: 1, // Hanya ambil 1 gambar untuk performa
+          take: 1, 
         },
       },
     })

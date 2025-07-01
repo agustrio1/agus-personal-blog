@@ -33,6 +33,8 @@ export function PostCard({ post, featured = false }: PostCardProps) {
               style={{ objectFit: "cover" }}
               loading="lazy"
               sizes="(max-width: 768px) 100vw, 300px"
+              placeholder="blur"
+              blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PC9zdmc+"
             />
           </div>
         )}
@@ -55,7 +57,7 @@ export function PostCard({ post, featured = false }: PostCardProps) {
             })}
           </div>
           <p className="text-gray-600 dark:text-gray-300 leading-relaxed line-clamp-2">
-            {post.content.replace(/<[^>]+>/g, "").slice(0, 150)}...
+            {post.content.replace(/<[^>]+>/g, "").slice(0, 120)}...
           </p>
         </div>
       </div>
