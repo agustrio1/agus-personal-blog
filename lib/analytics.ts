@@ -1,14 +1,23 @@
 import type { GtagConfigExtended, GtagEventExtended } from "@/types/analytics"
 
+// Utility functions untuk Google Analytics yang dioptimalkan
+let isProcessingQueue = false
+
 // Utility functions dengan proper TypeScript checks
 export const trackEvent = (action: string, category: string, label?: string, value?: number) => {
   if (typeof window !== "undefined" && window.gtag) {
-    const config: GtagEventExtended = {
-      event_category: category,
-      event_label: label,
-      value: value,
+    try {
+      window.gtag("event", action, {
+        event_category: category,
+        event_label: label,
+        value: value,
+      })
+      // console.log("Analytics event tracked:", { action, category, label, value })
+    } catch (error) {
+      console.error("Failed to track event:", error)
     }
-    window.gtag("event", action, config)
+  } else {
+    console.warn("Google Analytics not available")
   }
 }
 
@@ -37,11 +46,15 @@ export const trackEventThrottled = (action: string, category: string, label?: st
 // Track page views dengan null checks
 export const trackPageView = (url: string, title?: string) => {
   if (typeof window !== "undefined" && window.gtag && process.env.NEXT_PUBLIC_GA_ID) {
-    const config: GtagConfigExtended = {
-      page_path: url,
-      page_title: title,
+    try {
+      window.gtag("config", process.env.NEXT_PUBLIC_GA_ID, {
+        page_path: url,
+        page_title: title,
+      })
+      console.log("Page view tracked:", { url, title })
+    } catch (error) {
+      console.error("Failed to track page view:", error)
     }
-    window.gtag("config", process.env.NEXT_PUBLIC_GA_ID, config)
   }
 }
 
@@ -87,6 +100,32 @@ export const initializeConsent = () => {
       functionality_storage: "granted",
       personalization_storage: "denied",
       security_storage: "granted",
+    })
+  }
+}
+
+export const testAnalytics = () => {
+  if (typeof window !== "undefined") {
+    // console.log("Testing Google Analytics...")
+    // console.log("GA ID:", process.env.NEXT_PUBLIC_GA_ID)
+    // console.log("gtag available:", !!window.gtag)
+    // console.log("dataLayer:", window.dataLayer)
+
+    // Send test event
+    trackEvent("test_event", "debug", "analytics_test", 1)
+  }
+}
+
+// Performance monitoring
+export const trackPerformance = () => {
+  if (typeof window !== "undefined" && "performance" in window) {
+    window.addEventListener("load", () => {
+      setTimeout(() => {
+        const perfData = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming
+        if (perfData) {
+          trackEvent("page_load_time", "performance", "load_complete", Math.round(perfData.loadEventEnd))
+        }
+      }, 0)
     })
   }
 }

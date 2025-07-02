@@ -13,12 +13,20 @@ export function ConsentBanner() {
     const consent = localStorage.getItem("analytics-consent")
     if (!consent) {
       setShowBanner(true)
+    } else if (consent === "accepted") {
+      // Jika sudah accept, langsung enable analytics
+      if (typeof window !== "undefined" && window.gtag) {
+        window.gtag("consent", "update", {
+          analytics_storage: "granted",
+        })
+      }
     }
   }, [])
 
   const handleAccept = () => {
     localStorage.setItem("analytics-consent", "accepted")
     setShowBanner(false)
+
     // Enable Google Analytics
     if (typeof window !== "undefined" && window.gtag) {
       window.gtag("consent", "update", {
@@ -30,7 +38,8 @@ export function ConsentBanner() {
   const handleDecline = () => {
     localStorage.setItem("analytics-consent", "declined")
     setShowBanner(false)
-    // Disable Google Analytics
+
+    // Keep analytics disabled
     if (typeof window !== "undefined" && window.gtag) {
       window.gtag("consent", "update", {
         analytics_storage: "denied",

@@ -34,7 +34,7 @@ export function Providers({
   // Check if current path is dashboard/admin area
   const isDashboard = pathname.startsWith("/dashboard") || pathname.startsWith("/admin")
 
-  // QueryClient untuk React Query
+  // QueryClient untuk React Query dengan optimasi
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -42,6 +42,7 @@ export function Providers({
           queries: {
             staleTime: 60 * 1000, // 1 menit
             refetchOnWindowFocus: false,
+            retry: 1, // Kurangi retry untuk performa
           },
         },
       }),

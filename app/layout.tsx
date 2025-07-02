@@ -3,7 +3,7 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
 import { Providers } from "./providers"
-import { AnalyticsProvider } from "@/components/analytics/analytics-provider"
+import { GoogleAnalyticsNextJS } from "@/components/analytics/google-analytics"
 import { getSiteSettings } from "@/lib/get-settings"
 import TopProgressBar from "@/components/ui/top-progress-bar"
 import { Suspense } from "react"
@@ -98,10 +98,11 @@ export default async function RootLayout({
       <body className={inter.className}>
         <Suspense fallback={<div>Loading...</div>}>
           <Providers blogName={settings.blogName || "Personal Blog"}>
-            <AnalyticsProvider gaId={process.env.NEXT_PUBLIC_GA_ID!}>
-              <TopProgressBar />
-              {children}
-            </AnalyticsProvider>
+            <TopProgressBar />
+            {children}
+
+            {/* Google Analytics - Menggunakan @next/third-parties */}
+            {process.env.NEXT_PUBLIC_GA_ID && <GoogleAnalyticsNextJS gaId={process.env.NEXT_PUBLIC_GA_ID} />}
           </Providers>
         </Suspense>
       </body>
