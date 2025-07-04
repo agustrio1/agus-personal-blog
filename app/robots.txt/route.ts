@@ -8,6 +8,8 @@ User-agent: *
 Allow: /
 
 Sitemap: ${siteUrl}/sitemap.xml
+Sitemap: ${siteUrl}/sitemap
+  `.trim()
 
   return new NextResponse(content, {
     headers: {
