@@ -1,19 +1,18 @@
 import { NextResponse } from "next/server"
 
 export async function GET() {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://agusdev.my.id"
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://agusdev.my.id"
 
-  const content = `
+  const content = `
 User-agent: *
 Allow: /
 
 Sitemap: ${siteUrl}/sitemap.xml
-Sitemap: ${siteUrl}/sitemap
-  `.trim()
+  `.trim()
 
-  return new NextResponse(content, {
-    headers: {
-      "Content-Type": "text/plain"
-    }
-  })
+  return new NextResponse(content, {
+    headers: {
+      "Content-Type": "text/plain"
+    }
+  })
 }
